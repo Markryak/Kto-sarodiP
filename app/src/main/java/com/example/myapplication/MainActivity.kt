@@ -14,33 +14,31 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        var scan = findViewById<Button>(R.id.buttonScan)
-        var stop = findViewById<Button>(R.id.buttonStop)
+        // setting up resources
+        val btnScan = findViewById<Button>(R.id.buttonScan)
+        val arrow = findViewById<ImageView>(R.id.Arrow)
+        arrow.setImageResource(R.mipmap.ic_launcher_foreground)
+        //arrow.visibility = View.GONE
+        arrow.visibility = View.VISIBLE
         var mp = MediaPlayer()
-        var arrow = findViewById<ImageView>(R.id.Arrow)
-        arrow.visibility = View.GONE
-        scan.setOnClickListener {
-            mp.setDataSource(
-                this,
-                Uri.parse("android.resource://" + this.packageName + "/" + R.raw.scan)
-            )
-            arrow.visibility = View.VISIBLE
-            arrow.setImageResource(R.mipmap.ic_launcher_foreground)
+        mp.setDataSource(
+            this,
+            Uri.parse("android.resource://" + this.packageName + "/" + R.raw.scan)
+        )
+
+        btnScan.setOnClickListener {
+            // Making buntton inactive while mp is in progress
+            btnScan.isClickable = false
+            // Starting media and setting arrow visibility
             mp.prepare()
             mp.start()
-            if (mp.isPlaying()) {
-                scan.isClickable = false
-            }
-            stop.setOnClickListener {
-                arrow.visibility = View.GONE
-                arrow.setImageResource(R.mipmap.ic_launcher_foreground)
-                mp.stop()
-                mp.release()
-                mp = MediaPlayer()
-                if (!mp.isPlaying()) {
-                    scan.isClickable = true
-                }
-            }
+            arrow.visibility = View.VISIBLE
+        }
+
+        mp.setOnCompletionListener {
+            btnScan.isClickable = true // Making button active
+            arrow.visibility = View.GONE // Hiding arrow
+            mp.stop()
         }
     }
 }
